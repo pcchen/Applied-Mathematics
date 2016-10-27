@@ -24,15 +24,15 @@ ax = fig.gca(projection="3d")
 plt.ion()
 
 class plate:
-	def __init__(self, sides=4, length=10):
+	def __init__(self, sides=4, width=10, length=10):
 		self.sides=sides
-		self.w=length
-		self.h=length
+		self.w=width
+		self.l=length
 		self.dots=[]
 	
 	def set_points(self):
 		if self.sides == 4:
-			self.dots = np.zeros(shape=(self.w, self.h))
+			self.dots = np.zeros(shape=(self.w, self.l))
 		elif self.sides == 0:
 			for i in range(self.w+1):
 				if i == 0:
@@ -45,7 +45,7 @@ class plate:
 	def set_BC(self, f_xu=zero, f_xl=zero, f_yu=zero, f_yl=zero):
 		if self.sides == 4:
 			x_max = self.w
-			y_max = self.h
+			y_max = self.l
 			for i in range(x_max):
 				self.dots[i][0] = f_xu(i)
 			for i in range(x_max):
@@ -63,7 +63,7 @@ class plate:
 		is_balance = True
 		if self.sides == 4:
 			row = self.w
-			col = self.h
+			col = self.l
 			for i in range(row-2):
 				i += 1
 				for j in range(col-2):
@@ -105,18 +105,19 @@ class plate:
 def draw_plate(num, plate, error):
 		if plate.sides == 4:
 			xs = np.arange(1, plate.w+1)
-			ys = np.arange(1, plate.h+1)
-			X, Y = np.meshgrid(xs, ys)
+			ys = np.arange(1, plate.l+1)
+			Y, X = np.meshgrid(ys, xs)
 		ax.clear()
 		plate.average(error)
 		surf = ax.plot_surface(X, Y, plate.dots, rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0)
 
 
 sides = int(input("Sides:"))
-length = int(input("Length:"))
+width = int(input("Width:"))
+length = int(input("Length(If you use circle boundary, then input 0 here.):"))
 error = float(input("Error:"))
 
-pl = plate(sides, length)
+pl = plate(sides, width, length)
 pl.set_points()
 ##set_BC(dots, slope_one, slope_one, slope_minus_one, slope_minus_one)
 pl.set_BC(cos, cos, cos, cos)
