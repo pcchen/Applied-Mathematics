@@ -1,11 +1,3 @@
-# sides: the shape of the disk (e.g. 4 for square)
-# Now only square available
-# length : the length of the plate
-# Needed these three parameters
-# Default: sides=4, length=10 error=0.001
-
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
