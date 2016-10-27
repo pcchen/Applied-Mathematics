@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.animation as animation
+import time
+
 
 def zero(x):
 	return 0
@@ -15,6 +18,10 @@ def sin(x):
 	return np.sin(x*12/180*np.pi)
 def cos(x):
 	return np.cos(x*12/180*np.pi)
+
+fig = plt.figure()
+ax = fig.gca(projection="3d")
+plt.ion()
 
 class plate:
 	def __init__(self, sides=4, length=10):
@@ -94,19 +101,16 @@ class plate:
 						if abs(tmp -self.dots[i][j]):
 							self.dots[i][j] = tmp
 							is_balance = False
-		if not is_balance:
-			self.average(error)
 
-	def draw_plate(self):
-		fig = plt.figure()
-		ax = fig.gca(projection="3d")
-
-		if self.sides == 4:
-			xs = np.arange(1, self.w+1)
-			ys = np.arange(1, self.h+1)
+def draw_plate(num, plate, error):
+		if plate.sides == 4:
+			xs = np.arange(1, plate.w+1)
+			ys = np.arange(1, plate.h+1)
 			X, Y = np.meshgrid(xs, ys)
-			surf = ax.plot_surface(X, Y, pl.dots, rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0)
-		plt.show()
+		ax.clear()
+		plate.average(error)
+		surf = ax.plot_surface(X, Y, plate.dots, rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0)
+
 
 sides = int(input("Sides:"))
 length = int(input("Length:"))
@@ -116,5 +120,8 @@ pl = plate(sides, length)
 pl.set_points()
 ##set_BC(dots, slope_one, slope_one, slope_minus_one, slope_minus_one)
 pl.set_BC(cos, cos, cos, cos)
-pl.average(error)
-pl.draw_plate()
+
+
+ani = animation.FuncAnimation(fig, draw_plate, fargs=(pl, error), interval=100)
+plt.show()
+##pl.dynamic_draw(error)
