@@ -1,6 +1,7 @@
 # sides: the shape of the disk (e.g. 4 for square)
 # Now only square available
 # length : the unit length
+# Needed these three parameters
 # Default: sides=4, length=10 error=0.001
 
 
