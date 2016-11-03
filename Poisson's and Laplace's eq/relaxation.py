@@ -33,14 +33,9 @@ class plate:
 	def set_points(self):
 		if self.sides == 4:
 			self.dots = np.zeros(shape=(self.w, self.l))
+
 		elif self.sides == 0:
-			for i in range(self.w+1):
-				if i == 0:
-					nums = 1
-					self.dots = [[0]]
-				else:
-					nums = 2**(2*i)
-					self.dots.append([0]*nums)
+			self.dots = np.zeros(shape=(self.w, 30))
 
 	def set_BC(self, f_xu=zero, f_xl=zero, f_yu=zero, f_yl=zero):
 		if self.sides == 4:
@@ -55,8 +50,7 @@ class plate:
 			for i in range(y_max):
 				self.dots[x_max-1][i] = f_yl(i)
 		elif self.sides == 0:
-			l = len(self.dots[-1])
-			for i in range(l):
+			for i in range(30):
 				self.dots[-1][i] = f_xu(i)
 
 	def average(self, error=0.001):
@@ -73,40 +67,27 @@ class plate:
 						self.dots[i][j] = tmp
 						is_balance = False
 		elif self.sides == 0:
-			radius = self.w
-			tmp = 0
-			for i in range(radius):
-				i = radius - i
-				dot_num = len(self.dots[i]) 
-				if i == 0:
-					for j in range(self.dots[i+1]):
-						tmp += dots[i+1][j]
-					if abs(tmp/4 - self.dots[i][0]) > error:
-						self.dots[i][0] = tmp
+			r = self.w
+			for i in range(r-1):
+				for j in range(30):
+					if i == 0:
+						tmp = (self.dots[i+1][j] + self.dots[i][(j+1)%30] + self.dots[i][j-1]) / 4
+					else:
+						tmp = (self.dots[i-1][j] + self.dots[i+1][j] + self.dots[i][(j+1)%30] + self.dots[i][j-1]) / 4
+					if abs(tmp - self.dots[i][j]) > error:
+						self.dots[i][j] = tmp
 						is_balance = False
-				elif i == 1:
-					for j in range(dot_num):
-						tmp = (self.dots[i-1][0] + self.dots[i+1][j*2] + self.dots[i][j-1] + self.dots[i][(j+1)%4])/4
-						if abs(tmp - self.dots[i][j]) > error:
-							self.dots[i][j] = tmp
-							is_balance = False
-				else:
-					for j in range(dot_num):
-						if j%2 == 0:
-							tmp = (self.dots[i-1][j//2] + self.dots[i+1][j*2] + self.dots[i][j-1] + self.dots[i][(j+1)%dot_num])/4
-						else:
-							avg = (self.dots[i-1][j//2] + self.dots[i-1][j//2+1])/2
-							tmp = (avg + self.dots[i+1][j*2] + self.dots[i][j-1] + self.dots[i][(j+1)%dot_num])
-
-						if abs(tmp -self.dots[i][j]):
-							self.dots[i][j] = tmp
-							is_balance = False
 
 def draw_plate(num, plate, error):
 		if plate.sides == 4:
 			xs = np.arange(1, plate.w+1)
 			ys = np.arange(1, plate.l+1)
 			Y, X = np.meshgrid(ys, xs)
+		elif plate.sides == 0:
+			rs = np.arange(0, plate.w)
+			thetas = np.linspace(0, 2*np.pi, 30)
+			X = np.outer(rs, np.cos(thetas))
+			Y = np.outer(rs, np.sin(thetas))
 		ax.clear()
 		plate.average(error)
 		surf = ax.plot_surface(X, Y, plate.dots, rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0)
@@ -120,9 +101,9 @@ error = float(input("Error:"))
 pl = plate(sides, width, length)
 pl.set_points()
 ##set_BC(dots, slope_one, slope_one, slope_minus_one, slope_minus_one)
-pl.set_BC(cos, cos, cos, cos)
+pl.set_BC(sin, cos, cos, cos)
 
 
-ani = animation.FuncAnimation(fig, draw_plate, fargs=(pl, error), interval=100)
+ani = animation.FuncAnimation(fig, draw_plate, fargs=(pl, error), interval=50)
 plt.show()
 ##pl.dynamic_draw(error)
