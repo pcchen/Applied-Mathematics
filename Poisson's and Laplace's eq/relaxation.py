@@ -92,16 +92,19 @@ def draw_plate(num, plate, error):
 		plate.average(error)
 		surf = ax.plot_surface(X, Y, plate.dots, rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0)
 
-
+print("Sides: 0 = circle, 4 = rectangle.")
+print("Width: Width of a rectangle, or radius of a circle.")
+print("Length: Length of a rectangle. Please input 0 when using circular boundary.")
+print("Error: Tolerance.\n\n")
 sides = int(input("Sides:"))
 width = int(input("Width:"))
-length = int(input("Length(If you use circle boundary, then input 0 here.):"))
+length = int(input("Length:"))
 error = float(input("Error:"))
 
 pl = plate(sides, width, length)
 pl.set_points()
 ##set_BC(dots, slope_one, slope_one, slope_minus_one, slope_minus_one)
-pl.set_BC(sin, cos, cos, cos)
+pl.set_BC(cos, cos, cos, cos)
 
 
 ani = animation.FuncAnimation(fig, draw_plate, fargs=(pl, error), interval=50)
