@@ -4,7 +4,9 @@ from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 import time
+##import matplotlib
 
+plt.switch_backend("TkAgg")
 
 def zero(x):
 	return 0
